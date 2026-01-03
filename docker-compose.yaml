@@ -1,10 +1,12 @@
 services:
+  # ===== AMD64 =====
   nav2:
-    build:
-      context: .
-    image: cuda12.9.1-python3.14.2:bookworm-slim-ros-humble-uv
+    build: .
+    image: cuda12.9.1:humble-uv-nvm
     container_name: nav2
+    privileged: true
     tty: true
+    network_mode: host
     ipc: host
     environment:
       - DISPLAY=${DISPLAY:-host.docker.internal:0}
@@ -26,3 +28,27 @@ services:
               capabilities: [gpu, utility, compute, graphics]
     profiles:
       - gpu
+
+  # ===== Jetson ARM64 =====
+  nav2-jetson:
+    build:
+      args:
+        BASE_IMAGE: dustynv/cudnn:8.9-r36.2.0
+    image: cudnn8.9-jetson:humble-uv-nvm
+    container_name: nav2-jetson
+    runtime: nvidia
+    privileged: true
+    tty: true
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
+    volumes:
+      - .:/root/nav2
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/argus_socket:/tmp/argus_socket
+      - ~/.Xauthority:/root/.Xauthority
+    profiles:
+      - jetson
