@@ -1,28 +1,28 @@
 services:
-  ros-humble-docker:
+  nav2:
     build:
       context: .
     image: cuda12.9.1-python3.14.2:bookworm-slim-ros-humble-uv
-    container_name: ros-humble-docker
+    container_name: nav2
     tty: true
     ipc: host
     environment:
       - DISPLAY=${DISPLAY:-host.docker.internal:0}
       - QT_X11_NO_MITSHM=1
     volumes:
-      - .:/root/ros-humble-docker
+      - .:/root/nav2
       - /tmp/.X11-unix:/tmp/.X11-unix
 
-  ros-humble-docker-gpu:
+  nav2-gpu:
     extends:
-      service: ros-humble-docker
-    container_name: ros-humble-docker-gpu
+      service: nav2
+    container_name: nav2-gpu
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu]
+              capabilities: [gpu, utility, compute, graphics]
     profiles:
       - gpu
