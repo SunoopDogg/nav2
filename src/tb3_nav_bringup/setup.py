@@ -6,7 +6,6 @@ package_name = 'tb3_nav_bringup'
 
 
 def get_recursive_data_files(base_dir):
-    """재귀적으로 디렉토리 내 모든 파일을 data_files 형식으로 반환"""
     data_files = []
 
     for root, dirs, files in os.walk(base_dir):
