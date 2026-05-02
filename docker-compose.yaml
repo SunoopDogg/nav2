@@ -1,19 +1,21 @@
 services:
   # ===== AMD64 =====
   nav2:
-    build: .
     image: cuda12.9.1:humble-uv-nvm
+    build: .
     container_name: nav2
-    privileged: true
-    tty: true
-    network_mode: host
-    ipc: host
-    environment:
-      - DISPLAY=${DISPLAY:-host.docker.internal:0}
-      - QT_X11_NO_MITSHM=1
     volumes:
       - .:/root/nav2
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - uv-cache:/root/.cache/uv
+    environment:
+      - DISPLAY=${DISPLAY:-host.docker.internal:0}
+      - QT_X11_NO_MITSHM=1
+    network_mode: host
+    working_dir: /root/nav2
+    ipc: host
+    privileged: true
+    tty: true
 
   nav2-gpu:
     extends:
@@ -31,24 +33,29 @@ services:
 
   # ===== Jetson ARM64 =====
   nav2-jetson:
+    image: cudnn8.9-jetson:humble-uv-nvm
     build:
       args:
         BASE_IMAGE: dustynv/cudnn:8.9-r36.2.0
-    image: cudnn8.9-jetson:humble-uv-nvm
     container_name: nav2-jetson
-    runtime: nvidia
-    privileged: true
-    tty: true
-    network_mode: host
-    ipc: host
-    environment:
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
-      - XAUTHORITY=/root/.Xauthority
     volumes:
       - .:/root/nav2
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/argus_socket:/tmp/argus_socket
       - ~/.Xauthority:/root/.Xauthority
+      - uv-cache:/root/.cache/uv
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
+    network_mode: host
+    working_dir: /root/nav2
+    ipc: host
+    privileged: true
     profiles:
       - jetson
+    runtime: nvidia
+    tty: true
+
+volumes:
+  uv-cache:
